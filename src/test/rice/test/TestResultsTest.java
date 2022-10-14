@@ -1,9 +1,14 @@
 package test.rice.test;
 
-import main.rice.obj.*;
-import main.rice.test.*;
+import main.rice.obj.PyBoolObj;
+import main.rice.obj.PyIntObj;
+import main.rice.obj.PyStringObj;
+import main.rice.test.TestCase;
+import main.rice.test.TestResults;
 import org.junit.jupiter.api.*;
+
 import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -17,10 +22,23 @@ class TestResultsTest {
     private static List<TestCase> testCases;
 
     /**
-     * A TestResults object and its corresponding caseToFiles and wrongSet.
+     * A TestResults object for the case where there are no tests.
      */
-    private static TestResults testResults;
-    private static List<Set<Integer>> caseToFiles;
+    private static TestResults noTests;
+
+    /**
+     * A TestResults object (and its caseToFiles list) for the case where all files pass
+     * all tests.
+     */
+    private static TestResults allPass;
+    private static List<Set<Integer>> allFilesPass;
+
+    /**
+     * A TestResults object (and its caseToFiles list) for the case where some files fail
+     * some tests.
+     */
+    private static TestResults someFail;
+    private static List<Set<Integer>> someFilesFail;
     private static Set<Integer> wrongSet;
 
     /**
@@ -28,23 +46,42 @@ class TestResultsTest {
      */
     @BeforeAll
     static void setUp() {
-        // Set up 10 test cases
+        // Set up a trivial TestResults for the situation where there are no tests
+        noTests = new TestResults(List.of(), List.of(), Set.of());
+
+        // Set up 10 test cases, to be shared by allPass and someFail
         testCases = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             testCases.add(new TestCase(List.of(new PyBoolObj(true), new PyIntObj(i),
                     new PyStringObj(String.valueOf((char) i)))));
         }
 
-        // Create a caseToFiles and wrongSet
-        caseToFiles = new ArrayList<>();
-        wrongSet = new HashSet<>();
+        // Create a caseToFiles list for the case where all files are correct
+        allFilesPass = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            caseToFiles.add(Set.of(i));
-            wrongSet.add(i);
+            // Each case failed no files
+            allFilesPass.add(new HashSet<>());
         }
+        allPass = new TestResults(testCases, allFilesPass, Set.of());
 
-        // Create TestResults
-        testResults = new TestResults(testCases, caseToFiles, wrongSet);
+        // Create a wrongSet and caseToFiles list for the case where some files are wrong
+        wrongSet = new HashSet<>();
+        someFilesFail = new ArrayList<>();
+        Set<Integer> failedSet;
+        for (int i = 0; i < 10; i++) {
+            // Let odd numbered files be wrong
+            failedSet = new HashSet<>();
+            if (i % 2 != 0) {
+                wrongSet.add(i);
+            } else {
+                // Let even case i catch odd-numbered files of index >= i
+                for (int j = i + 1; j < 10; j += 2) {
+                    failedSet.add(j);
+                }
+            }
+            someFilesFail.add(failedSet);
+        }
+        someFail = new TestResults(testCases, someFilesFail, wrongSet);
     }
 
     /**
@@ -52,7 +89,15 @@ class TestResultsTest {
      */
     @Test
     void testGetTestCaseValid() {
-        assertEquals(testCases.get(3), testResults.getTestCase(3));
+        assertEquals(testCases.get(3), allPass.getTestCase(3));
+    }
+
+    /**
+     * Tests getTestCase() using an index of 0.
+     */
+    @Test
+    void testGetTestCaseZero() {
+        assertEquals(testCases.get(0), allPass.getTestCase(0));
     }
 
     /**
@@ -60,30 +105,54 @@ class TestResultsTest {
      */
     @Test
     void testGetTestCaseOutOfBoundsNeg() {
-        assertNull(testResults.getTestCase(-1));
+        assertNull(someFail.getTestCase(-1));
     }
 
     /**
-     * Tests getTestCase() using a positive index that's out of bounds; should return null.
+     * Tests getTestCase() using an index that's out of bounds; should return null.
      */
     @Test
     void testGetTestCaseOutOfBoundsPos() {
-        assertNull(testResults.getTestCase(10));
+        assertNull(someFail.getTestCase(10));
     }
 
     /**
-     * Tests getWrongSet().
+     * Tests getWrongSet() when the wrong set is empty.
      */
     @Test
-    void testGetWrongSet() {
-        assertEquals(new HashSet<>(wrongSet), testResults.getWrongSet());
+    void testGetWrongSetEmpty() {
+        assertEquals(new HashSet<>(), allPass.getWrongSet());
     }
 
     /**
-     * Tests getCaseToFiles().
+     * Tests getWrongSet() when the wrong set is non-empty.
      */
     @Test
-    void testGetCaseToFiles() {
-        assertEquals(new ArrayList<>(caseToFiles), testResults.getCaseToFiles());
+    void testGetWrongSetNonEmpty() {
+        assertEquals(new HashSet<>(wrongSet), someFail.getWrongSet());
+    }
+
+    /**
+     * Tests getCaseToFiles() when there are no tests.
+     */
+    @Test
+    void testGetCaseToFilesEmpty() {
+        assertEquals(List.of(), noTests.getCaseToFiles());
+    }
+
+    /**
+     * Tests getCaseToFiles() when all files pass all tests.
+     */
+    @Test
+    void testGetCaseToFilesAllPass() {
+        assertEquals(new ArrayList<>(allFilesPass), allPass.getCaseToFiles());
+    }
+
+    /**
+     * Tests getCaseToFiles() when some files fail some tests.
+     */
+    @Test
+    void testGetCaseToFilesNonEmpty() {
+        assertEquals(new ArrayList<>(someFilesFail), someFail.getCaseToFiles());
     }
 }

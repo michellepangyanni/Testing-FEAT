@@ -11,20 +11,11 @@ import java.util.*;
  * to run the test suite on a set of files and identify which test cases each file fails
  * on.
  */
-
-
-/**
- * A class for running a test suite. Encapsulates the ability to run the test suite on a
- * reference implementation to generate the expected results, the ability to create a
- * "wrapper" file for comparing actual results to these expected results, and the ability
- * to run the test suite on a set of files and identify which test cases each file fails
- * on.
- */
 public class Tester {
     /**
      * the name of the function under test
      */
-    private String funcToTest;
+    private String func_under_test;
     /**
      * the absolute path to the file containing the reference implementation
      */
@@ -43,11 +34,12 @@ public class Tester {
      *
      * @param funcName: a String representing the name of the function to be tested
      * @param solutionPath: a String representing the path to the solution file to test against
-     * @param implDirPath: a String representing the path to the directory containing the buggy student implementations of the function
+     * @param implDirPath: a String representing the path to the directory containing the buggy student
+     * implementations of the function
      * @param tests: a List of TestCase objects to be tested on the student implementations and reference solution
      */
     public Tester(String funcName, String solutionPath, String implDirPath, List<TestCase> tests) {
-        this.funcToTest = funcName;
+        this.func_under_test = funcName;
         this.solAbsPath = solutionPath;
         this.implDirPath = implDirPath;
         this.testsToExecute = tests;
@@ -187,7 +179,7 @@ public class Tester {
                 // convert each arg to python object
                 writer.write("  args = [eval(arg) for arg in args]\n");
                 // * unpacks the values
-                writer.write("  result = " + this.funcToTest + "(*args)\n");
+                writer.write("  result = " + this.func_under_test + "(*args)\n");
                 writer.write("  print(result)\n");
 
                 writer.close();
@@ -197,8 +189,8 @@ public class Tester {
     }
 
     /**
-     * This method is responsible for running the list of tests on every file in the directory of buggy implementations
-     * and returning the results in the form of a TestResults object.
+     * This method is responsible for running the list of tests on every file in the directory of
+     * buggy implementations and returning the results in the form of a TestResults object.
      *
      * @return: A valid TestResults object that represents the result of running a series of test cases
      * on a series of student implementations
@@ -262,7 +254,7 @@ public class Tester {
                 cmdBuggy[2] = caseIndex + "";
                 // third element is relative path (name), not absolute path
                 cmdBuggy[3] = file;
-                cmdBuggy[4] = this.funcToTest;
+                cmdBuggy[4] = this.func_under_test;
                 int cmdIndex = 5;
                 for (APyObj arg : test.getArgs()) {
                     cmdBuggy[cmdIndex] = arg.toString();
@@ -315,13 +307,14 @@ public class Tester {
      * Helper method for runTests() that counts the number of valid files in the given buggy directory.
      * A "valid file" ends with ".py", with the exception of "expected.py" and "wrapper.py"
      *
-     * @param buggyDirectoryTemp: the directory of the buggy implementations to search
+     * @param buggyDirectoryTemp, the directory of the buggy implementations to search
      * @return: an int representing the number of valid file names in the given input
      */
     private int countValidFiles(String[] buggyDirectoryTemp) {
         int validBugFile = 0;
         for (int i = 0; i < buggyDirectoryTemp.length; i++) {
-            if (buggyDirectoryTemp[i].endsWith(".py") && !buggyDirectoryTemp[i].endsWith("expected.py") && !buggyDirectoryTemp[i].endsWith("wrapper.py")) {
+            if (buggyDirectoryTemp[i].endsWith(".py") && !buggyDirectoryTemp[i].endsWith("expected.py")
+                    && !buggyDirectoryTemp[i].endsWith("wrapper.py")) {
                 validBugFile++;
             }
         }

@@ -2,14 +2,17 @@ package main.rice.test;
 import main.rice.obj.APyObj;
 import java.util.*;
 
+/**
+ * This class represents a single test case, comprised of a series of arguments
+ */
 public class TestCase {
     /**
-     * field for constructor arguments
+     * Field for constructor arguments
      */
     private List<APyObj> listArgs;
 
     /**
-     * Constructor for a TestCase object, which takes in a List of arguments.
+     * Constructor for a TestCase object, takes in a List of arguments.
      *
      * @param args
      */
@@ -18,16 +21,16 @@ public class TestCase {
     }
 
     /**
-     * Returns the List of arguments comprising this test case.
      *
-     * @return
+     *
+     * @return the List of arguments comprising this test case.
      */
     public List<APyObj> getArgs() {
         return this.listArgs;
     }
 
     /**
-     * This should simply invoke the toString() method on the internal (List) representation of the arguments.
+     * Simply invoke the toString() method on the internal (List) representation of the arguments.
      * @return a string representation of this test case.
      */
     public String toString() {
@@ -62,22 +65,11 @@ public class TestCase {
             }
         }
         return true;
-//        if (obj instanceof TestCase && this.listArgs instanceof TestCase) {
-//            List<APyObj> tempObj = ((TestCase) obj).getArgs();
-//            for (int i = 0; i < tempObj.size(); i++) {
-//                if (tempObj.get(i) != this.getArgs().get(i)) {
-//                    return false;
-//                }
-//            }
-//            return true;
-//        } else {
-//            return false;
-//        }
     }
 
     /**
      * Computes and returns a hash code for this object.
-     * You should ensure that two objects that are considered equal by equals() will also have the same hash code.
+     * To ensure that two objects that are considered equal by equals() will also have the same hash code.
      * This method may not return the same value for all TestCase instances, though some collisions are inevitable.
      *
      * @return hashcode
@@ -85,6 +77,5 @@ public class TestCase {
     public int hashCode() {
         return this.getArgs().hashCode();
     }
-
 
 }

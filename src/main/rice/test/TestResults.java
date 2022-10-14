@@ -1,6 +1,10 @@
 package main.rice.test;
 import java.util.*;
 
+/**
+ * This class represents the results of testing.
+ * It bundles together three pieces of data that will be computed during the testing process.
+ */
 public class TestResults {
     /**
      * fields
